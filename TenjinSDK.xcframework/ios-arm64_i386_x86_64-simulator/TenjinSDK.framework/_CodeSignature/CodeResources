@@ -10,7 +10,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		pirgfR3QkiEvKUh4yanq5cRl6BM=
+		9yCNI+nEndAEk+pa5YnxU4JDWRE=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -21,6 +21,10 @@
 	<dict>
 		<key>Headers/TenjinSDK.h</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			RIUvg5AVTyyZbEi261rDqiBilfc=
+			</data>
 			<key>hash2</key>
 			<data>
 			GocpGD8fcJsBel8nmuml8uYLUC1j19UqDltJ1GOUxyA=
@@ -28,6 +32,10 @@
 		</dict>
 		<key>Modules/module.modulemap</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			Q3WAPfywpZnDvUbKDeQzkjr3ins=
+			</data>
 			<key>hash2</key>
 			<data>
 			/9GuWAuHvjHS9NJie5P+EKupD+XL+CtopGDnfdR9I7k=
