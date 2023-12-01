@@ -15,15 +15,15 @@ The Tenjin iOS SDK allows users to track events and installs in their iOS apps. 
 # Table of contents
 
 - [SDK Integration][1]
-	- [Tenjin initialization with ATTrackingManager][2]
-		- [Displaying an ATT permission prompt][3]
-			- [Configuring a user tracking description][4]
-	- [SKAdNetwork and Conversion value][5]
-		- [SKAdNetwork and iOS 15+ Advertiser Postbacks][6]
-	- [Tenjin and GDPR][7]
-	- [Device-Related Parameters][8]
+    - [Tenjin initialization with ATTrackingManager][2]
+        - [Displaying an ATT permission prompt][3]
+            - [Configuring a user tracking description][4]
+    - [SKAdNetwork and Conversion value][5]
+        - [SKAdNetwork and iOS 15+ Advertiser Postbacks][6]
+    - [Tenjin and GDPR][7]
+    - [Device-Related Parameters][8]
 - [Purchase Events][9]
-	- [Subscription IAP][10]
+    - [Subscription IAP][10]
 - [Custom Events][11]
 - [Deferred Deeplink][12]
 - [Server-to-server integration][13]
@@ -31,25 +31,38 @@ The Tenjin iOS SDK allows users to track events and installs in their iOS apps. 
 - [Impression Level Ad Revenue Integration][15]
 - [Attribution Info][16]
 - [Customer User ID][17]
+- [Retry/cache events and IAP][39]
+
 
 # <a id="sdk-integration"></a> SDK Integration
 
-Add this repository to your Swift Package Manager sources and checkout the latest version of the package.
+## CocoaPods
+If you use pods, add `pod 'TenjinSDK'` to your `Podfile` then run `pod install` and skip to step 4 under Steps for Objective-C projects.
+
+## Swift Package Manager
+If you use SPM, add Tenjin’s SDK package through Xcode with this repository [here](https://github.com/tenjin/tenjin-ios-spm) and skip to step 4 under Steps for Swift projects.
+
+1. Download the latest SDK release [here][38].
+
+2. Drag `TenjinSDK.xcframework` and `TenjinSDK.h` to your project under build phases -> "Link Binary With Libraries".
+
+3. Include the linker flags `-ObjC` under your Build Settings
+![Dashboard][image-2]
 
 ## Steps for Objective-C projects
 
-1. Go to your AppDelegate file, by default `AppDelegate.m`, and `#import <TenjinSDK/TenjinSDK.h>`.
+4. Go to your AppDelegate file, by default `AppDelegate.m`, and `#import "TenjinSDK.h"`.
 
-2. Get your `SDK_KEY` from your app page. Note: `SDK_KEY` is unique for each of your app. You can create up to 3 keys for the same app.
+5. Get your `SDK_KEY` from your app page. Note: `SDK_KEY` is unique for each of your app. You can create up to 3 keys for the same app.
    ![Dashboard][image-4]
 
-3. In your `didFinishLaunchingWithOptions` method add:
+6. In your `didFinishLaunchingWithOptions` method add:
     ```objectivec
     [TenjinSDK initialize:@"<SDK_KEY>"];
     [TenjinSDK connect];
     ```
 
-4. To enable Tenjin iOS SDK debug logs add:
+7. To enable Tenjin iOS SDK debug logs add:
     ```objectivec
       [TenjinSDK debugLogs];
     ```
@@ -73,7 +86,7 @@ Add this repository to your Swift Package Manager sources and checkout the lates
 
 ## Steps for Swift projects
 
-1. Add Objective-C Bridging Header file for swift projects,
+4. Add Objective-C Bridging Header file for swift projects,
     <ol type="a">
       <li>Create a header file
         <ol type="i">
@@ -96,9 +109,9 @@ Add this repository to your Swift Package Manager sources and checkout the lates
       </li>
     </ol>
 
-2. Get your `SDK_KEY` from your [Tenjin Organization tab][18].
+6. Get your `SDK_KEY` from your app page.
 
-3. In your `didFinishLaunchingWithOptions` method add:
+7. In your `didFinishLaunchingWithOptions` method add:
     ```swift
     TenjinSDK.getInstance("<SDK_KEY>")
     TenjinSDK.connect()
@@ -106,7 +119,7 @@ Add this repository to your Swift Package Manager sources and checkout the lates
     If you are using Swift 5, use the `getInstance()` method instead of `init()`.  See our [sample Swift app][19].
 
 
-4. To enable Tenjin iOS SDK debug logs add:
+9. To enable Tenjin iOS SDK debug logs add:
     ```swift
       TenjinSDK.debugLogs();
     ```
@@ -196,18 +209,28 @@ Apple requires a description for the ATT permission prompt. You need to set the 
 - Enter the key name `NSUserTrackingUsageDescription`.
 - Select a string value type.
 - Enter the app tracking transparency message in the value field. Some examples include:
-	- "We will use your data to provide a better and personalized ad experience."
-	- "We try to show ads for apps and products that will be most interesting to you based on the apps you use, the device you are on, and the country you are in."
-	- "We try to show ads for apps and products that will be most interesting to you based on the apps you use."
+    - "We will use your data to provide a better and personalized ad experience."
+    - "We try to show ads for apps and products that will be most interesting to you based on the apps you use, the device you are on, and the country you are in."
+    - "We try to show ads for apps and products that will be most interesting to you based on the apps you use."
 
 > Note: Apple provides specific [app store guidelines][20] that define acceptable use and messaging for all end-user facing privacy-related features. Tenjin does not provide legal advice. Therefore, the information on this page is not a substitute for seeking your own legal counsel to determine the legal requirements of your business and processes, and how to address them.
 
 ## <a id="skadnetwork-and-conversion-value"></a> SKAdNetwork and Conversion value
 
-As part of <a href="https://developer.apple.com/documentation/storekit/skadnetwork">SKAdNetwork</a>, we created wrapper method for <a href="https://developer.apple.com/documentation/storekit/skadnetwork/3919928-updatepostbackconversionvalue">`updatePostbackConversionValue(_:)`</a>.
+As part of <a href="https://developer.apple.com/documentation/storekit/skadnetwork">SKAdNetwork</a>, we created a wrapper method for <a href="https://developer.apple.com/documentation/storekit/skadnetwork/3919928-updatepostbackconversionvalue">`updatePostbackConversionValue(_:)`</a>.
 Our method will register the equivalent SKAdNetwork methods and also send the conversion values to our servers.
 
-updatePostbackConversionValue(\_:) 6 bit value should correspond to the in-app event and shouldn’t be entered as binary representation but 0-63 integer. Please refer to [this][21] page for how to implement conversion values.
+`updatePostbackConversionValue(\_:)` 6 bit value should correspond to the in-app event and shouldn’t be entered as binary representation but 0-63 integer. Please refer to [this][21] page for how to implement conversion values.
+
+As of iOS 16.1, which supports SKAdNetwork 4.0, you can now send `coarseValue` (String, with possible variants being "low", "medium" or "high") and `lockWindow` (Boolean) as parameters on the update postback method:
+
+`updatePostbackConversionValue(_ conversionValue: Integer, coarseValue: String)`
+
+`updatePostbackConversionValue(_ conversionValue: Integer, coarseValue: String, lockWindow: Bool)`
+
+-   For iOS version 16.1+ which supports SKAdNetwork 4.0, you can call this method as many times as you want and can make the conversion value lower or higher than the previous value.
+    
+-   For iOS versions lower than 16.1 supporting SKAdnetWork versions lower than 4.0, you can call this method and our SDK will automatically detect the iOS version and update `conversionValue` only.
 
 ```objectivec
 #import "TenjinSDK.h"
@@ -226,6 +249,14 @@ updatePostbackConversionValue(\_:) 6 bit value should correspond to the in-app e
     // You will need to use a value between 0-63 for <YOUR 6 bit value>.
     //
     [TenjinSDK updatePostbackConversionValue: <YOUR 6 bit value>];
+    
+    // For iOS 16.1+ (SKAN 4.0)
+
+    [TenjinSDK updatePostbackConversionValue: <YOUR 6 bit value> coarseValue:@"medium"];
+
+    [TenjinSDK updatePostbackConversionValue: <YOUR 6 bit value> coarseValue:@"medium" lockWindow:true];
+
+}
 }
 ```
 
@@ -241,7 +272,7 @@ To specify Tenjin as the destination for your [SK Ad Network postbacks][22], do 
 
 These steps are an adaption from Apple's instructions at [https://developer.apple.com/documentation/storekit/skadnetwork/configuring\_an\_advertised\_app][23].
 
-## <a id="gdpr"></a> Tenjin and GDPR
+## <a id="gdpr"></a> GDPR
 
 As part of GDPR compliance, with Tenjin's SDK you can opt-in, opt-out devices/users, or select which specific device-related params to opt-in or opt-out.  `OptOut()` will not send any API requests to Tenjin, and we will not process any events.
 
@@ -282,9 +313,9 @@ To opt-in/opt-out specific device-related parameters, you can use the `OptInPara
 
 - Kindly note that we require the following parameter to properly track devices in Tenjin's system. If the mandatory parameter is missing, the event will not be processed or recorded.
 
-	- `developer_device_id`
+    - `developer_device_id`
 
-If you intend to use Google Ads, you will also need to add: `platform`, `os_version`, `locale`, `device_model`, and `build_id`.
+If you intend to use Google Ads, you will also need to add: `platform`, `os_version`, `app_version`, `locale`, `device_model`, and `build_id`.
 
 If you want to only get specific device-related parameters, use `OptInParams()`. In example below, we will only these device-related parameters: `ip_address`, `advertising_id`, `developer_device_id`, `limit_ad_tracking`, and `iad`:
 
@@ -328,7 +359,6 @@ NSArray *optOutParams = @[@"country", @"timezone", @"language"];
 | country | locale country | [iOS][36] |
 | timezone | timezone | [iOS][37] |
 
-
 # <a id="purchase-events"></a>Purchase Events
 
 Pass `(SKPaymentTransaction *) transaction` and `(NSData *)receipt` object, after the verification of the purchase, and then you can pass `SKPaymentTransactionStatePurchased` to Tenjin for the transaction which was purchased:
@@ -342,6 +372,16 @@ NSData *receiptData = [NSData dataWithContentsOfURL:receiptURL];
 ```
 
 **Disclaimer:** If you are implementing purchase events on Tenjin for the first time, make sure to verify the data with other tools you’re using before you start scaling up your user acquisition campaigns using purchase data.
+
+:warning: **(Flexible App Store Commission setup)**
+
+Choose between 15% and 30% App Store’s revenue commission via our new setup. The steps are -
+* Go to CONFIGURE --> Apps
+* Click on the app you want to change it for
+* Under the ‘App Store Commission’ section click ‘Edit’
+* Choose 30% or 15% as your desired app store commission.
+* Select the start date and end date (Or you can keep the end date blank if you dont want an end date)
+* Click Save (note: the 15% commission can be applied only to dates moving forward and not historical dates. So please set the start date from the date you make the change and forward)
 
 ## <a id="subscription-iap"></a> Subscription IAP
 
@@ -379,12 +419,6 @@ Custom events can also pass an `NSString` `eventValue`. Tenjin will use this `ev
 [TenjinSDK sendEventWithName:@"swipe_right" andEventValue:@"1"];
 ```
 
-# <a id="deferred-deeplink"></a>Deferred Deeplink
-
-Tenjin supports the ability to direct users to a specific part of your app after a new attributed installation via Tenjin's campaign tracking URLs. 
-
-:warning: **NOTE: Deferred Deeplink is a paid feature, so please contact your Tenjin account manager if you are interested in.**
-
 # <a id="server-to-server"></a>Server-to-server integration
 
 Tenjin offers server-to-server integration. If you want to access to the documentation, please send email to support@tenjin.com.
@@ -405,20 +439,22 @@ This data will appear within DataVault, where you will be able to run reports us
 
 Tenjin supports the ability to integrate with the Impression Level Ad Revenue (ILRD) feature from,
 - AppLovin
-- IronSource
+- Unity LevelPlay
 - HyperBid
 - AdMob
 - TopOn
+- CAS
+- TradPlus
 
 This feature allows you to receive events which correspond to your ad revenue that is affected by each advertisement show to a user. To enable this feature, follow the below instructions.
 
 :warning: **NOTE: ILRD is a paid feature, so please contact your Tenjin account manager to discuss the price at first before sending ILRD events.**
 
-# <a id="attributionInfo"></a>Attribution Info
+# <a id="attributionInfo"></a>Live Ops Campaigns
 
 Tenjin supports retrieving of attributes, which are required for developers to get analytics installation id (previously known as tenjin reference id). This parameter can be used when there is no advertising id.
 
-:warning: **NOTE: Attribution Info is a paid feature, so please contact your Tenjin account manager if you are interested in.**
+:warning: **NOTE: LiveOps Campaigns is a paid feature, so please contact your Tenjin account manager if you are interested in.**
 
 # <a id="customer-user-id"></a>Customer User ID
 You can set and get customer user id to send as a parameter on events.
@@ -433,45 +469,56 @@ You can set and get customer user id to send as a parameter on events.
 userId = [TenjinSDK getCustomerUserId]; 
 ```
 
-[1]:	#sdk-integration
-[2]:	#attrackingmanager
-[3]:	#displayattprompt
-[4]:	#configureusertrackdescription
-[5]:	#skadnetwork-and-conversion-value
-[6]:	#skadnetwork-and-ios15-plus-advertiser-postbacks
-[7]:	#gdpr
-[8]:	#device-related-parameters
-[9]:	#purchase-events
-[10]:	#subscription-iap
-[11]:	#custom-events
-[12]:	#deferred-deeplink
-[13]:	#server-to-server
-[14]:	#subversion
-[15]:	#ilrd
-[16]:	#attributionInfo
-[17]:	https://github.com/tenjin/tenjin-ios-sdk/releases
-[18]:	https://tenjin.io/dashboard/organizations
-[19]:	https://github.com/tenjin/tenjin-ios-sdk-swift-demo
-[20]:	https://developer.apple.com/app-store/user-privacy-and-data-use/
-[21]:	https://docs.tenjin.com/en/tracking/sk_adnetwork.html#cv
-[22]:	https://developer.apple.com/documentation/storekit/skadnetwork/receiving_ad_attributions_and_postbacks
-[23]:	https://developer.apple.com/documentation/storekit/skadnetwork/configuring_an_advertised_app
-[24]:	https://developer.apple.com/documentation/adsupport/asidentifiermanager/1614151-advertisingidentifier
-[25]:	https://developer.apple.com/documentation/uikit/uidevice/1620059-identifierforvendor
-[26]:	https://developer.apple.com/documentation/adsupport/asidentifiermanager/1614148-isadvertisingtrackingenabled
-[27]:	https://searchads.apple.com/advanced/help/measure-results/#attribution-api
-[28]:	https://developer.apple.com/documentation/uikit/uidevice/1620043-systemversion
-[29]:	https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/man3/sysctl.3.html
-[30]:	https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/man3/sysctl.3.html
-[31]:	https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/man3/sysctl.3.html
-[32]:	https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/man3/sysctl.3.html
-[33]:	https://developer.apple.com/documentation/uikit/uidevice/1620043-systemversion
-[34]:	https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/man3/sysctl.3.html
-[35]:	https://developer.apple.com/documentation/foundation/nslocalekey
-[36]:	https://developer.apple.com/documentation/foundation/nslocalecountrycode
-[37]:	https://developer.apple.com/documentation/foundation/nstimezone/1387209-localtimezone
+# <a id="retry-cache"></a>Retry/cache of events/IAP
+You can enable/disable retrying and caching events and IAP when requests fail or users don't have internet connection. These events will be sent after a new event has been added to the queue and user has recovered connection.
 
-[image-1]:	https://github.com/tenjin/tenjin-ios-sdk/blob/master/assets/ios_link_binary.png?raw=true "dashboard"
-[image-2]:	https://github.com/tenjin/tenjin-ios-sdk/raw/master/assets/ios_linker_flags.png?raw=true "dashboard"
-[image-3]:	https://s3.amazonaws.com/tenjin-instructions/sdk_live_open_events.png
-[image-4]:	https://s3.amazonaws.com/tenjin-instructions/app_api_key.png
+`setCacheEventSetting(true)`
+
+```objectivec
+[TenjinSDK setCacheEventSetting:true];
+```
+
+[1]:    #sdk-integration
+[2]:    #attrackingmanager
+[3]:    #displayattprompt
+[4]:    #configureusertrackdescription
+[5]:    #skadnetwork-and-conversion-value
+[6]:    #skadnetwork-and-ios15-plus-advertiser-postbacks
+[7]:    #gdpr
+[8]:    #device-related-parameters
+[9]:    #purchase-events
+[10]:    #subscription-iap
+[11]:    #custom-events
+[12]:    #deferred-deeplink
+[13]:    #server-to-server
+[14]:    #subversion
+[15]:    #ilrd
+[16]:    #attributionInfo
+[17]:   #customer-user-id
+[18]:    https://tenjin.io/dashboard/organizations
+[19]:    https://github.com/tenjin/tenjin-ios-sdk-swift-demo
+[20]:    https://developer.apple.com/app-store/user-privacy-and-data-use/
+[21]:    https://docs.tenjin.com/en/tracking/sk_adnetwork.html#cv
+[22]:    https://developer.apple.com/documentation/storekit/skadnetwork/receiving_ad_attributions_and_postbacks
+[23]:    https://developer.apple.com/documentation/storekit/skadnetwork/configuring_an_advertised_app
+[24]:    https://developer.apple.com/documentation/adsupport/asidentifiermanager/1614151-advertisingidentifier
+[25]:    https://developer.apple.com/documentation/uikit/uidevice/1620059-identifierforvendor
+[26]:    https://developer.apple.com/documentation/adsupport/asidentifiermanager/1614148-isadvertisingtrackingenabled
+[27]:    https://searchads.apple.com/advanced/help/measure-results/#attribution-api
+[28]:    https://developer.apple.com/documentation/uikit/uidevice/1620043-systemversion
+[29]:    https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/man3/sysctl.3.html
+[30]:    https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/man3/sysctl.3.html
+[31]:    https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/man3/sysctl.3.html
+[32]:    https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/man3/sysctl.3.html
+[33]:    https://developer.apple.com/documentation/uikit/uidevice/1620043-systemversion
+[34]:    https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/man3/sysctl.3.html
+[35]:    https://developer.apple.com/documentation/foundation/nslocalekey
+[36]:    https://developer.apple.com/documentation/foundation/nslocalecountrycode
+[37]:    https://developer.apple.com/documentation/foundation/nstimezone/1387209-localtimezone
+[38]:    https://github.com/tenjin/tenjin-ios-sdk/releases
+[39]: #retry-cache
+[image-1]:    https://github.com/tenjin/tenjin-ios-sdk/blob/master/assets/ios_link_binary.png?raw=true "dashboard"
+[image-2]:    https://github.com/tenjin/tenjin-ios-sdk/raw/master/assets/ios_linker_flags.png?raw=true "dashboard"
+[image-3]:    https://s3.amazonaws.com/tenjin-instructions/sdk_live_open_events.png
+[image-4]:    https://s3.amazonaws.com/tenjin-instructions/app_api_key.png
+
