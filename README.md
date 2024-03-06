@@ -6,7 +6,7 @@ The Tenjin iOS SDK allows users to track events and installs in their iOS apps. 
 - For Unity-specific instructions, please visit https://github.com/tenjin/tenjin-unity-sdk.
 - For any issues or support, please contact: support@tenjin.com
 
-### Notes:
+### Notes
 
   - Xcode 13 requirement, if you’re using iOS SDK v1.12.17 and higher.
   - For AppTrackingTransparency, be sure to update your project `.plist` file and add `Privacy - Tracking Usage Description` <a href="https://developer.apple.com/documentation/bundleresources/information_property_list/nsusertrackingusagedescription" target="_new">(NSUserTrackingUsageDescription)</a> along with the text message you want to display to users. This library is only available in iOS 14.0+.
@@ -21,6 +21,7 @@ The Tenjin iOS SDK allows users to track events and installs in their iOS apps. 
     - [SKAdNetwork and Conversion value][5]
         - [SKAdNetwork and iOS 15+ Advertiser Postbacks][6]
     - [Tenjin and GDPR][7]
+        - [Opt in/Opt out using CMP consents][41]
     - [Device-Related Parameters][8]
 - [Purchase Events][9]
     - [Subscription IAP][10]
@@ -31,6 +32,8 @@ The Tenjin iOS SDK allows users to track events and installs in their iOS apps. 
 - [Impression Level Ad Revenue Integration][15]
 - [Attribution Info][16]
 - [Customer User ID][17]
+- [Analytics Installation ID][40]
+- [Google DMA parameters][42]
 - [Retry/cache events and IAP][39]
 
 
@@ -135,7 +138,8 @@ If you use SPM, add Tenjin’s SDK package through Xcode with this repository [h
     }
     ```
 
-**NOTE:** Please ensure you implement this code on every `didFinishLaunchingWithOptions`, not only on the first app open of the app. If we notice that you don't follow our recommendation, we can't give you the proper support or your account might be under suspension.
+> [!NOTE]
+> Please ensure you implement this code on every `didFinishLaunchingWithOptions`, not only on the first app open of the app. If we notice that you don't follow our recommendation, we can't give you the proper support or your account might be under suspension.
 
 In the step 7, you can also try alternate initialization to handle deep links from other services. If you use other services to produce deferred deep links, you can pass Tenjin those deep links to handle the attribution logic with your Tenjin enabled deep links.
 
@@ -199,7 +203,8 @@ You can also still call Tenjin `connect()`, without using ATTrackingManager, onl
 
 To comply with Apple’s ATT guidelines, you must provide a description for the ATT permission prompt, then implement the permission request in your application.
 
-> Note: You must implement the permission request before serving ads in your game.
+> [!NOTE]
+> You must implement the permission request before serving ads in your game.
 
 #### <a id="configureusertrackdescription"></a> Configuring a user tracking description
 Apple requires a description for the ATT permission prompt. You need to set the description with the `NSUserTrackingUsageDescription` key in the `Info.plist` file of your Xcode project. You have to provide a message that informs the user why you are requesting permission to use device tracking data:
@@ -213,7 +218,8 @@ Apple requires a description for the ATT permission prompt. You need to set the 
     - "We try to show ads for apps and products that will be most interesting to you based on the apps you use, the device you are on, and the country you are in."
     - "We try to show ads for apps and products that will be most interesting to you based on the apps you use."
 
-> Note: Apple provides specific [app store guidelines][20] that define acceptable use and messaging for all end-user facing privacy-related features. Tenjin does not provide legal advice. Therefore, the information on this page is not a substitute for seeking your own legal counsel to determine the legal requirements of your business and processes, and how to address them.
+> [!NOTE]
+> Apple provides specific [app store guidelines][20] that define acceptable use and messaging for all end-user facing privacy-related features. Tenjin does not provide legal advice. Therefore, the information on this page is not a substitute for seeking your own legal counsel to determine the legal requirements of your business and processes, and how to address them.
 
 ## <a id="skadnetwork-and-conversion-value"></a> SKAdNetwork and Conversion value
 
@@ -338,6 +344,16 @@ NSArray *optOutParams = @[@"country", @"timezone", @"language"];
 [TenjinSDK connect];
 ```
 
+### <a id="optin-cmp"></a>Opt in/out using CMP
+You can automatically opt in or opt out using your CMP consents (purpose 1) which are already saved in the user's device. The method returns a boolean to let you know if it's opted in or out.
+
+`optInOutUsingCMP()`
+
+```objectivec
+[TenjinSDK initialize:@"<SDK_KEY>"];
+optInOut = [TenjinSDK optInOutUsingCMP]; 
+```
+
 ### <a id="device-related-parameters"></a> Device-Related Parameters
 
 | Param  | Description | Reference |
@@ -448,13 +464,15 @@ Tenjin supports the ability to integrate with the Impression Level Ad Revenue (I
 
 This feature allows you to receive events which correspond to your ad revenue that is affected by each advertisement show to a user. To enable this feature, follow the below instructions.
 
-:warning: **NOTE: ILRD is a paid feature, so please contact your Tenjin account manager to discuss the price at first before sending ILRD events.**
+> [!WARNING]
+> ILRD is a paid feature, so please contact your Tenjin account manager to discuss the price at first before sending ILRD events.
 
 # <a id="attributionInfo"></a>Live Ops Campaigns
 
 Tenjin supports retrieving of attributes, which are required for developers to get analytics installation id (previously known as tenjin reference id). This parameter can be used when there is no advertising id.
 
-:warning: **NOTE: LiveOps Campaigns is a paid feature, so please contact your Tenjin account manager if you are interested in.**
+> [!WARNING]
+> LiveOps Campaigns is a paid feature, so please contact your Tenjin account manager if you are interested in.
 
 # <a id="customer-user-id"></a>Customer User ID
 You can set and get customer user id to send as a parameter on events.
@@ -467,6 +485,26 @@ You can set and get customer user id to send as a parameter on events.
 [TenjinSDK initialize:@"<SDK_KEY>"];
 [TenjinSDK setCustomerUserId:@"user_id"];
 userId = [TenjinSDK getCustomerUserId]; 
+```
+
+# <a id="analytics-id"></a>Analytics Installation ID
+You can get the analytics id which is generated randomly and saved in the local storage of the device.
+
+`getAnalyticsInstallationId()`
+
+```objectivec
+[TenjinSDK initialize:@"<SDK_KEY>"];
+analyticsId = [TenjinSDK getAnalyticsInstallationId]; 
+```
+
+# <a id="google-dma"></a>Google DMA parameters
+If you already have a CMP integrated, Google DMA parameters will be automatically collected by the Tenjin SDK. There’s nothing to implement in the Tenjin SDK if you have a CMP integrated.
+If you want to override your CMP, or simply want to build your own consent mechanisms, you can use the following:
+
+`setGoogleDMAParametersWithAdPersonalization(bool, bool)`
+
+```objectivec
+[[TeninSDK sharedInstance] setGoogleDMAParametersWithAdPersonalization:adPersonalization adUserData:adUserData]; 
 ```
 
 # <a id="retry-cache"></a>Retry/cache of events/IAP
@@ -517,8 +555,10 @@ You can enable/disable retrying and caching events and IAP when requests fail or
 [37]:    https://developer.apple.com/documentation/foundation/nstimezone/1387209-localtimezone
 [38]:    https://github.com/tenjin/tenjin-ios-sdk/releases
 [39]: #retry-cache
+[40]: #analytics-id
+[41]: #optin-cmp
+[42]: #google-dma
 [image-1]:    https://github.com/tenjin/tenjin-ios-sdk/blob/master/assets/ios_link_binary.png?raw=true "dashboard"
 [image-2]:    https://github.com/tenjin/tenjin-ios-sdk/raw/master/assets/ios_linker_flags.png?raw=true "dashboard"
 [image-3]:    https://s3.amazonaws.com/tenjin-instructions/sdk_live_open_events.png
 [image-4]:    https://s3.amazonaws.com/tenjin-instructions/app_api_key.png
-
