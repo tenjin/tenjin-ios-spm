@@ -239,6 +239,13 @@ SWIFT_CLASS("_TtC9TenjinSDK10GDPRHelper")
 @end
 
 
+SWIFT_CLASS("_TtC9TenjinSDK31GoogleOnDeviceConversionManager")
+@interface GoogleOnDeviceConversionManager : NSObject
+- (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
+- (void)fetchAggregateConversionInfo;
+@end
+
+
 typedef SWIFT_ENUM(NSInteger, PurposeConsentStatus, open) {
   PurposeConsentStatusConsentNull = 0,
   PurposeConsentStatusConsentTrue = 1,
@@ -303,6 +310,10 @@ SWIFT_CLASS("_TtC9TenjinSDK16TenjinDatasource")
 + (void)setBooleanValue:(BOOL)value key:(NSString * _Nonnull)key;
 + (void)setCacheEventsSetting:(BOOL)isCacheEventsEnabled;
 + (BOOL)getCacheEventsSetting SWIFT_WARN_UNUSED_RESULT;
++ (void)setEncryptRequestsSetting:(BOOL)isEncryptRequestsEnabled;
++ (BOOL)getEncryptRequestsSetting SWIFT_WARN_UNUSED_RESULT;
++ (void)setODMInfo:(NSString * _Nonnull)odmInfo;
++ (NSString * _Nullable)getODMInfo SWIFT_WARN_UNUSED_RESULT;
 + (NSString * _Nonnull)getAnalyticsInstallationId SWIFT_WARN_UNUSED_RESULT;
 - (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
 @end
@@ -565,6 +576,13 @@ SWIFT_CLASS("_TtC9TenjinSDK10GDPRHelper")
 @end
 
 
+SWIFT_CLASS("_TtC9TenjinSDK31GoogleOnDeviceConversionManager")
+@interface GoogleOnDeviceConversionManager : NSObject
+- (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
+- (void)fetchAggregateConversionInfo;
+@end
+
+
 typedef SWIFT_ENUM(NSInteger, PurposeConsentStatus, open) {
   PurposeConsentStatusConsentNull = 0,
   PurposeConsentStatusConsentTrue = 1,
@@ -629,6 +647,10 @@ SWIFT_CLASS("_TtC9TenjinSDK16TenjinDatasource")
 + (void)setBooleanValue:(BOOL)value key:(NSString * _Nonnull)key;
 + (void)setCacheEventsSetting:(BOOL)isCacheEventsEnabled;
 + (BOOL)getCacheEventsSetting SWIFT_WARN_UNUSED_RESULT;
++ (void)setEncryptRequestsSetting:(BOOL)isEncryptRequestsEnabled;
++ (BOOL)getEncryptRequestsSetting SWIFT_WARN_UNUSED_RESULT;
++ (void)setODMInfo:(NSString * _Nonnull)odmInfo;
++ (NSString * _Nullable)getODMInfo SWIFT_WARN_UNUSED_RESULT;
 + (NSString * _Nonnull)getAnalyticsInstallationId SWIFT_WARN_UNUSED_RESULT;
 - (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
 @end
@@ -891,6 +913,13 @@ SWIFT_CLASS("_TtC9TenjinSDK10GDPRHelper")
 @end
 
 
+SWIFT_CLASS("_TtC9TenjinSDK31GoogleOnDeviceConversionManager")
+@interface GoogleOnDeviceConversionManager : NSObject
+- (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
+- (void)fetchAggregateConversionInfo;
+@end
+
+
 typedef SWIFT_ENUM(NSInteger, PurposeConsentStatus, open) {
   PurposeConsentStatusConsentNull = 0,
   PurposeConsentStatusConsentTrue = 1,
@@ -955,6 +984,10 @@ SWIFT_CLASS("_TtC9TenjinSDK16TenjinDatasource")
 + (void)setBooleanValue:(BOOL)value key:(NSString * _Nonnull)key;
 + (void)setCacheEventsSetting:(BOOL)isCacheEventsEnabled;
 + (BOOL)getCacheEventsSetting SWIFT_WARN_UNUSED_RESULT;
++ (void)setEncryptRequestsSetting:(BOOL)isEncryptRequestsEnabled;
++ (BOOL)getEncryptRequestsSetting SWIFT_WARN_UNUSED_RESULT;
++ (void)setODMInfo:(NSString * _Nonnull)odmInfo;
++ (NSString * _Nullable)getODMInfo SWIFT_WARN_UNUSED_RESULT;
 + (NSString * _Nonnull)getAnalyticsInstallationId SWIFT_WARN_UNUSED_RESULT;
 - (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
 @end
