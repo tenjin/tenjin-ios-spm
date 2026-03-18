@@ -89,7 +89,7 @@ If you use SPM, add Tenjin’s SDK package through Xcode with this repository [h
 
 ## Steps for Swift projects
 
-4. Add Objective-C Bridging Header file for swift projects,
+4. Add Objective-C Bridging Header file for swift projects, only if you don't already have one:
     <ol type="a">
       <li>Create a header file
         <ol type="i">
