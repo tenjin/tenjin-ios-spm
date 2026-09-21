@@ -56,5 +56,4 @@ jobs:
           gh release create "$VERSION" -R "$GITHUB_REPOSITORY" \
             --target "$MERGE_SHA" \
             --title "$VERSION" \
-            --notes-file notes.md \
-            --latest
+            --notes-file notes.md
