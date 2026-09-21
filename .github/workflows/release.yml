@@ -1,0 +1,60 @@
+name: Release
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [master]
+
+permissions:
+  contents: write
+
+jobs:
+  github_release:
+    if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'release-')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get version from branch name
+        id: version
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        run: |
+          VERSION="${HEAD_REF#release-}"
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Branch $HEAD_REF does not contain a valid version"
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Ensure release does not already exist
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          if gh release view "$VERSION" -R "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release $VERSION already exists"
+            exit 1
+          fi
+
+      - name: Get release notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.version.outputs.version }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          # Use the notes from the matching tenjin-ios-sdk release, falling back to the PR body
+          if ! gh release view "$VERSION" -R tenjin/tenjin-ios-sdk --json body -q .body > notes.md 2>/dev/null || [ ! -s notes.md ]; then
+            echo "$PR_BODY" > notes.md
+          fi
+          cat notes.md
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.version.outputs.version }}
+          MERGE_SHA: ${{ github.event.pull_request.merge_commit_sha }}
+        run: |
+          gh release create "$VERSION" -R "$GITHUB_REPOSITORY" \
+            --target "$MERGE_SHA" \
+            --title "$VERSION" \
+            --notes-file notes.md \
+            --latest
